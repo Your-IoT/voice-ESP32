@@ -46,6 +46,28 @@
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   
   <script type="text/javascript">
+     const firebaseURL = "https://voice-recognition-34791-default-rtdb.europe-west1.firebasedatabase.app/text.json"; // Pridaj .json na konci
+
+        // Funkcia na odoslanie dát do Firebase
+        async function sendDataToFirebase(text) {
+            try {
+                const response = await fetch(firebaseURL, {
+                    method: "PUT", // Použi PUT pre aktualizáciu, POST ak chceš pridať nový záznam
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ text: text, timestamp: Date.now() })
+                });
+
+                if (response.ok) {
+                    console.log("Úspešne odoslané do Firebase!");
+                } else {
+                    console.error("Chyba pri odosielaní:", response.statusText);
+                }
+            } catch (error) {
+                console.error("Chyba:", error);
+            }
+        }
     function startDictation() {
       // Použitie štandardného API alebo fallback na webkitSpeechRecognition
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -61,6 +83,7 @@
           var result = e.results[0][0].transcript;
           console.log("Recognized command:", result);
           document.getElementById("recognized-text").innerText = result;
+          sendDataToFirebase(result);
         };
 
         recognition.onerror = function (e) {
