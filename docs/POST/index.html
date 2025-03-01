@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voice control for ESP32 - Web Speech API</title>
+  <meta name="description" content="Voice control system for RC car">
+  <meta name="keywords" content="esp32, voice, control, arduino, wiring, wifi, ethernet, phy, rmii, lan8720, especko">
+  <meta name="author" content="Martin Chlebovec">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding-top: 54px; }
+    @media (min-width: 992px) { body { padding-top: 56px; } }
+    footer { position: fixed; left: 0; bottom: 0; height: 30px; width: 100%; background: #999; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Voice control for ESP32</a>
+      <div class="collapse navbar-collapse" id="navbarResponsive"></div>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <form id="labnol" method="post">
+          <br>
+          <img onclick="startDictation();" src="https://i.imgur.com/IdiyJ17.png" height="256" width="256" alt="For voice control command click on microphone!">
+        </form>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-lg-12 text-center mt-4">
+        <h3>Recognized Command:</h3>
+        <p id="recognized-text" style="font-size: 1.5em; font-weight: bold; color: #D35400;"></p>
+        <p id="error-message" style="color: red; font-weight: bold;"></p>
+      </div>
+    </div>
+  </div>
+  
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  
+  <script type="text/javascript">
+     const firebaseURL = "https://voice-recognition-34791-default-rtdb.europe-west1.firebasedatabase.app/data.json"; // Pridaj .json na konci
+
+        // Funkcia na odoslanie dát do Firebase
+        async function sendDataToFirebase(text) {
+            try {
+                const response = await fetch(firebaseURL, {
+                    method: "POST", // Použi PUT pre aktualizáciu, POST ak chceš pridať nový záznam
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ text: text, timestamp: Date.now() })
+                });
+
+                if (response.ok) {
+                    console.log("Úspešne odoslané do Firebase!");
+                } else {
+                    console.error("Chyba pri odosielaní:", response.statusText);
+                }
+            } catch (error) {
+                console.error("Chyba:", error);
+            }
+        }
+    function startDictation() {
+      // Použitie štandardného API alebo fallback na webkitSpeechRecognition
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (SpeechRecognition) {
+        var recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "en-US"; // Zmeň na "sk-SK" pre slovenčinu
+        recognition.start();
+
+        recognition.onresult = function (e) {
+          var result = e.results[0][0].transcript;
+          console.log("Recognized command:", result);
+          document.getElementById("recognized-text").innerText = result;
+          sendDataToFirebase(result);
+        };
+
+        recognition.onerror = function (e) {
+          console.error("Speech recognition error:", e);
+          document.getElementById("error-message").innerText = "Error: Speech recognition failed.";
+        };
+
+        recognition.onend = function () {
+          console.log("Speech recognition ended.");
+        };
+      } else {
+        document.getElementById("error-message").innerText = "Your browser does not support speech recognition.";
+      }
+    }
+  </script>
+</body>
+</html>
