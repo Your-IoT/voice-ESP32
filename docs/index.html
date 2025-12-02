@@ -12,7 +12,23 @@
   <style>
     body { padding-top: 54px; }
     @media (min-width: 992px) { body { padding-top: 56px; } }
-    footer { position: fixed; left: 0; bottom: 0; height: 30px; width: 100%; background: #999; }
+    footer {
+  position: fixed;       /* aby bol stále pri spodnej hrane okna */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 80, 0, 0.85);  /* tmavozelené pozadie s priehľadnosťou */
+  color: #d4edda;
+  text-align: center;
+  padding: 10px 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.9em;
+  z-index: 1000;         /* aby bol nad AR scénou a videom */
+}
+footer p {
+  margin: 2px 10px;
+  text-align: justify;
+}
   </style>
 </head>
 <body>
@@ -99,5 +115,11 @@
       }
     }
   </script>
+  <footer>
+  <div>
+    <p>Návod: <a href="https://deadawp.blog.sector.sk/blogclanok/13467/esp32-hlasove-ovladanie-s-firebase-realtime-databazou.htm" target="_blank" style="color:#b2f2bb;">https://deadawp.blog.sector.sk/blogclanok/13467/esp32-hlasove-ovladanie-s-firebase-realtime-databazou.htm</a></p>
+    <p>&copy; 2024–2025 Martin Chlebovec. All rights reserved.</p>
+  </div>
+</footer>
 </body>
 </html>
